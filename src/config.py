@@ -91,7 +91,21 @@ def build_sources(*, max_articles_per_feed: int) -> list[SourceDefinition]:
         ),
         SourceDefinition(
             name="CNA Latest",
-            url="https://www.channelnewsasia.com/rss/latest",
+            url="https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml",
+            source_type="rss",
+            section="singapore_asia",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
+            name="Straits Times Singapore",
+            url="https://www.straitstimes.com/news/singapore/rss.xml",
+            source_type="rss",
+            section="singapore_asia",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
+            name="Business Times Top Stories",
+            url="https://www.businesstimes.com.sg/rss/top-stories",
             source_type="rss",
             section="singapore_asia",
             limit=max_articles_per_feed,
