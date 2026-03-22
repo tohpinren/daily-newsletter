@@ -135,15 +135,12 @@ async def curate_sections_with_llm(
     api_key: str,
     section_articles: dict[SectionName, list[Article]],
 ) -> list[NewsletterSection]:
-    """Curate all sections with Gemini and fallback logic."""
-    section_limits: dict[SectionName, int] = {
-        "world_news": 10,
-        "singapore_asia": 5,
-        "tech_swe": 10,
-        "ai_ml": 8,
-        "hacker_news": 10,
-        "engineering_blogs": 5,
-    }
+    """Curate all sections with Gemini and fallback logic.
+
+    Each section returns at most ten deduplicated items so every category has
+    comparable depth in the final email.
+    """
+    items_per_section = 10
     ordered_sections: list[SectionName] = [
         "world_news",
         "singapore_asia",
@@ -152,6 +149,9 @@ async def curate_sections_with_llm(
         "hacker_news",
         "engineering_blogs",
     ]
+    section_limits: dict[SectionName, int] = {
+        name: items_per_section for name in ordered_sections
+    }
 
     output_sections: list[NewsletterSection] = []
     for section_name in ordered_sections:

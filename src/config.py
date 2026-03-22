@@ -90,6 +90,13 @@ def build_sources(*, max_articles_per_feed: int) -> list[SourceDefinition]:
             limit=max_articles_per_feed,
         ),
         SourceDefinition(
+            name="The Guardian World",
+            url="https://www.theguardian.com/world/rss",
+            source_type="rss",
+            section="world_news",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
             name="CNA Latest",
             url="https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml",
             source_type="rss",
@@ -111,6 +118,13 @@ def build_sources(*, max_articles_per_feed: int) -> list[SourceDefinition]:
             limit=max_articles_per_feed,
         ),
         SourceDefinition(
+            name="SCMP Asia",
+            url="https://www.scmp.com/rss/3/feed/",
+            source_type="rss",
+            section="singapore_asia",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
             name="MIT Technology Review",
             url="https://www.technologyreview.com/feed/",
             source_type="rss",
@@ -120,6 +134,13 @@ def build_sources(*, max_articles_per_feed: int) -> list[SourceDefinition]:
         SourceDefinition(
             name="Changelog",
             url="https://changelog.com/feed",
+            source_type="rss",
+            section="tech_swe",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
+            name="TechCrunch",
+            url="https://techcrunch.com/feed/",
             source_type="rss",
             section="tech_swe",
             limit=max_articles_per_feed,
@@ -169,6 +190,13 @@ def build_sources(*, max_articles_per_feed: int) -> list[SourceDefinition]:
         SourceDefinition(
             name="Google DeepMind Blog",
             url="https://deepmind.google/blog/rss.xml",
+            source_type="rss",
+            section="ai_ml",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
+            name="Google AI Blog",
+            url="https://blog.google/innovation-and-ai/technology/ai/rss/",
             source_type="rss",
             section="ai_ml",
             limit=max_articles_per_feed,
