@@ -9,7 +9,7 @@ from typing import Literal
 from src.models import SectionName
 
 
-SourceType = Literal["rss", "api", "scrape"]
+SourceType = Literal["rss", "api", "scrape", "hashnode"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -132,6 +132,27 @@ def build_sources(*, max_articles_per_feed: int) -> list[SourceDefinition]:
             limit=max_articles_per_feed,
         ),
         SourceDefinition(
+            name="MIT Technology Review AI",
+            url="https://www.technologyreview.com/topic/artificial-intelligence/feed/",
+            source_type="rss",
+            section="ai_ml",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
+            name="Artificial Intelligence News",
+            url="https://artificialintelligence-news.com/feed/",
+            source_type="rss",
+            section="ai_ml",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
+            name="Times of AI",
+            url="https://www.timesofai.com/feed/",
+            source_type="rss",
+            section="ai_ml",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
             name="Changelog",
             url="https://changelog.com/feed",
             source_type="rss",
@@ -142,6 +163,48 @@ def build_sources(*, max_articles_per_feed: int) -> list[SourceDefinition]:
             name="TechCrunch",
             url="https://techcrunch.com/feed/",
             source_type="rss",
+            section="tech_swe",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
+            name="The Verge",
+            url="https://www.theverge.com/rss/index.xml",
+            source_type="rss",
+            section="tech_swe",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
+            name="Ars Technica",
+            url="https://feeds.arstechnica.com/arstechnica/index",
+            source_type="rss",
+            section="tech_swe",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
+            name="Wired",
+            url="https://www.wired.com/feed/rss",
+            source_type="rss",
+            section="tech_swe",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
+            name="Lobsters Programming",
+            url="https://lobste.rs/t/programming.rss",
+            source_type="rss",
+            section="tech_swe",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
+            name="DEV Community",
+            url="https://dev.to/feed",
+            source_type="rss",
+            section="tech_swe",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
+            name="Hashnode Featured",
+            url="https://gql.hashnode.com/",
+            source_type="hashnode",
             section="tech_swe",
             limit=max_articles_per_feed,
         ),

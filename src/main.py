@@ -10,6 +10,7 @@ import httpx
 from src.composer import compose_newsletter_html
 from src.config import SourceDefinition, build_sources, load_config
 from src.fetchers.hackernews import fetch_hackernews_articles
+from src.fetchers.hashnode import fetch_hashnode_featured_articles
 from src.fetchers.rss import fetch_rss_articles
 from src.fetchers.scraper import scrape_articles
 from src.models import Article, Newsletter
@@ -32,6 +33,8 @@ async def _fetch_source_with_retry(
                 return await fetch_hackernews_articles(source=source, client=client)
             if source.source_type == "scrape":
                 return await scrape_articles(source=source, client=client)
+            if source.source_type == "hashnode":
+                return await fetch_hashnode_featured_articles(source=source, client=client)
             return []
         except Exception:
             is_last_attempt = attempt == retries - 1
