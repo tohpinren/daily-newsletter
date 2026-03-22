@@ -2,7 +2,8 @@ name: Daily Newsletter
 
 on:
   schedule:
-    - cron: "0 0 * * *"
+    # 07:30 SGT (UTC+8) == 23:30 UTC
+    - cron: "30 23 * * *"
   workflow_dispatch:
 
 jobs:
