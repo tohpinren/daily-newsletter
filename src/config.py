@@ -9,7 +9,7 @@ from typing import Literal
 from src.models import SectionName
 
 
-SourceType = Literal["rss", "api", "scrape", "hashnode"]
+SourceType = Literal["rss", "api", "scrape", "hashnode", "github"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -262,6 +262,13 @@ def build_sources(*, max_articles_per_feed: int) -> list[SourceDefinition]:
             url="https://blog.google/innovation-and-ai/technology/ai/rss/",
             source_type="rss",
             section="ai_ml",
+            limit=max_articles_per_feed,
+        ),
+        SourceDefinition(
+            name="GitHub Trending Repositories",
+            url="https://api.github.com/search/repositories",
+            source_type="github",
+            section="tech_swe",
             limit=max_articles_per_feed,
         ),
         SourceDefinition(
