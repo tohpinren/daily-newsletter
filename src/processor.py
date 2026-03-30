@@ -14,6 +14,7 @@ SECTION_HEADINGS: dict[SectionName, str] = {
     "world_news": "World/Global Headlines",
     "singapore_asia": "Singapore and Asia",
     "tech_swe": "Tech and Software Engineering",
+    "fintech_news": "Fintech News",
     "ai_ml": "AI and Machine Learning",
     "hacker_news": "Hacker News Highlights",
     "engineering_blogs": "Engineering Blog Picks",
@@ -137,21 +138,23 @@ async def curate_sections_with_llm(
 ) -> list[NewsletterSection]:
     """Curate all sections with Gemini and fallback logic.
 
-    Each section returns at most ten deduplicated items so every category has
-    comparable depth in the final email.
+    Most sections return at most ten deduplicated items; fintech is capped at
+    five after curation.
     """
-    items_per_section = 10
+    default_items_per_section = 10
     ordered_sections: list[SectionName] = [
         "world_news",
         "singapore_asia",
         "tech_swe",
+        "fintech_news",
         "ai_ml",
         "hacker_news",
         "engineering_blogs",
     ]
     section_limits: dict[SectionName, int] = {
-        name: items_per_section for name in ordered_sections
+        name: default_items_per_section for name in ordered_sections
     }
+    section_limits["fintech_news"] = 5
 
     output_sections: list[NewsletterSection] = []
     for section_name in ordered_sections:

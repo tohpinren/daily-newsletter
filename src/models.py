@@ -12,6 +12,7 @@ SectionName = Literal[
     "world_news",
     "singapore_asia",
     "tech_swe",
+    "fintech_news",
     "ai_ml",
     "hacker_news",
     "engineering_blogs",
