@@ -31,6 +31,7 @@ class Article(BaseModel):
     published_at: datetime | None = None
     summary: str | None = None
     score: int | None = None
+    discussion_url: HttpUrl | None = None
 
 
 class NewsletterSection(BaseModel):

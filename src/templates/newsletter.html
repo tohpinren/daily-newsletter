@@ -29,7 +29,10 @@
         {% for item in section.items %}
         <li>
           <a href="{{ item.url }}">{{ item.title }}</a>
-          <span class="meta">({{ item.source }})</span>
+          {% if item.discussion_url %}
+          <span class="meta"> · </span><a href="{{ item.discussion_url }}">Hacker News</a>
+          {% endif %}
+          <span class="meta"> ({{ item.source }})</span>
           {% if item.summary %}
           <div>{{ item.summary }}</div>
           {% endif %}

@@ -12,15 +12,23 @@ from src.models import Article
 
 
 def _item_to_article(*, item: dict[str, object], source: SourceDefinition) -> Article | None:
-    """Convert a Hacker News item payload to an Article."""
+    """Convert a Hacker News item payload to an Article.
+
+    When the story has an external URL, ``url`` is that article and ``discussion_url``
+    is the Hacker News item page. For text or Ask HN posts with no outbound URL,
+    ``url`` is the Hacker News item page and ``discussion_url`` is omitted.
+    """
     title = str(item.get("title", "")).strip()
     if title == "":
         return None
 
     item_id = item.get("id")
-    url_value = str(item.get("url", "")).strip()
-    fallback_url = f"https://news.ycombinator.com/item?id={item_id}"
-    url = url_value if url_value != "" else fallback_url
+    if item_id is None:
+        return None
+
+    url_raw = item.get("url")
+    url_value = url_raw.strip() if isinstance(url_raw, str) else ""
+    hn_url = f"https://news.ycombinator.com/item?id={item_id}"
 
     timestamp = item.get("time")
     published_at = (
@@ -31,9 +39,19 @@ def _item_to_article(*, item: dict[str, object], source: SourceDefinition) -> Ar
     score_value = item.get("score")
     score = int(score_value) if isinstance(score_value, int) else None
 
+    if url_value != "":
+        return Article(
+            title=title,
+            url=url_value,
+            source=source.name,
+            section=source.section,
+            published_at=published_at,
+            score=score,
+            discussion_url=hn_url,
+        )
     return Article(
         title=title,
-        url=url,
+        url=hn_url,
         source=source.name,
         section=source.section,
         published_at=published_at,

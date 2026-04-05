@@ -4,7 +4,7 @@ Python pipeline that pulls headlines and engineering posts from RSS feeds, Hacke
 
 ## Sections
 
-Each section is capped at **10** items after LLM curation, except **Fintech News**, which is capped at **5**.
+Each section is capped at **10** items after LLM curation, except **Fintech News** and **Engineering Blog Picks**, which are capped at **5**.
 
 | Section | Role |
 |--------|------|
@@ -14,7 +14,7 @@ Each section is capped at **10** items after LLM curation, except **Fintech News
 | Fintech News | Payments, digital banking, and fintech trade RSS (five items after curation) |
 | AI and Machine Learning | Labs, research outlets, and AI news sites |
 | Hacker News | Top and best story IDs from the Firebase API |
-| Engineering Blog Picks | Company and infrastructure engineering blogs |
+| Engineering Blog Picks | Company and infrastructure engineering blogs (five items after curation) |
 
 Source list lives in `src/config.py` (`build_sources`).
 
