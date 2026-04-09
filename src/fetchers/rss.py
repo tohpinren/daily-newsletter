@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from calendar import timegm
+from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
+from typing import Any
 
 import feedparser
 import httpx
@@ -17,9 +19,36 @@ def _parse_published_datetime(*, raw_value: str | None) -> datetime | None:
     if raw_value is None or raw_value.strip() == "":
         return None
     try:
-        return parsedate_to_datetime(raw_value.strip())
+        parsed = parsedate_to_datetime(raw_value.strip())
+        if parsed.tzinfo is None:
+            return parsed.replace(tzinfo=UTC)
+        return parsed.astimezone(UTC)
     except (TypeError, ValueError):
         return None
+
+
+def _struct_time_to_utc(*, value: Any) -> datetime | None:
+    """Convert feedparser's published_parsed / updated_parsed tuple to UTC."""
+    if value is None:
+        return None
+    try:
+        return datetime.fromtimestamp(timegm(value), tz=UTC)
+    except (OverflowError, OSError, ValueError, TypeError):
+        return None
+
+
+def _entry_best_datetime(*, entry: feedparser.FeedParserDict) -> datetime | None:
+    """Resolve best-effort publication time from RSS or Atom fields."""
+    for key in ("published_parsed", "updated_parsed"):
+        dt = _struct_time_to_utc(value=entry.get(key))
+        if dt is not None:
+            return dt
+    published_raw = str(entry.get("published", "")).strip() or None
+    dt = _parse_published_datetime(raw_value=published_raw)
+    if dt is not None:
+        return dt
+    updated_raw = str(entry.get("updated", "")).strip() or None
+    return _parse_published_datetime(raw_value=updated_raw)
 
 
 def _entry_to_article(*, entry: feedparser.FeedParserDict, source: SourceDefinition) -> Article | None:
@@ -29,7 +58,6 @@ def _entry_to_article(*, entry: feedparser.FeedParserDict, source: SourceDefinit
     if title == "" or link == "":
         return None
 
-    published_raw = str(entry.get("published", "")).strip() or None
     summary = str(entry.get("summary", "")).strip() or None
 
     return Article(
@@ -37,7 +65,7 @@ def _entry_to_article(*, entry: feedparser.FeedParserDict, source: SourceDefinit
         url=link,
         source=source.name,
         section=source.section,
-        published_at=_parse_published_datetime(raw_value=published_raw),
+        published_at=_entry_best_datetime(entry=entry),
         summary=summary,
     )
 
