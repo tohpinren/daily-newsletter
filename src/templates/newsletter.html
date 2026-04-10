@@ -11,6 +11,7 @@
       h2 { margin-top: 28px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; }
       ul { padding-left: 18px; }
       li { margin-bottom: 10px; line-height: 1.45; }
+      .summary { color: #4b5563; font-size: 14px; margin-top: 4px; }
       a { color: #2563eb; text-decoration: none; }
       a:hover { text-decoration: underline; }
       .meta { color: #6b7280; font-size: 13px; }
@@ -33,8 +34,9 @@
           <span class="meta"> · </span><a href="{{ item.discussion_url }}">Hacker News</a>
           {% endif %}
           <span class="meta"> ({{ item.source }})</span>
-          {% if item.summary %}
-          <div>{{ item.summary }}</div>
+          {% set desc = item.summary | plain_summary %}
+          {% if desc %}
+          <div class="summary">{{ desc }}</div>
           {% endif %}
           {% if item.score %}
           <div class="meta">Score: {{ item.score }}</div>
