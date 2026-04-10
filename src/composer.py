@@ -14,36 +14,24 @@ from src.models import Newsletter
 SGT = ZoneInfo("Asia/Singapore")
 
 _MAX_SUMMARY_CHARS = 600
-_PLACEHOLDER_SUMMARIES = frozenset(
-    {
-        "none",
-        "null",
-        "n/a",
-        "none selected",
-    }
-)
 
 
 def plain_text_summary_from_html(*, raw: str | None, max_chars: int = _MAX_SUMMARY_CHARS) -> str | None:
     """Strip HTML and whitespace from a summary so email bodies stay readable.
 
     RSS feeds often put full article HTML in ``summary``; the LLM may also echo
-    markup. Returns ``None`` when there is nothing meaningful to show.
+    markup. Returns ``None`` when the result is empty after processing.
     """
     if raw is None:
         return None
     text = raw.strip()
     if text == "":
         return None
-    if text.lower() in _PLACEHOLDER_SUMMARIES:
-        return None
     if "<" in text and ">" in text:
         soup = BeautifulSoup(markup=text, features="html.parser")
         text = soup.get_text(separator=" ", strip=True)
     text = re.sub(pattern=r"\s+", repl=" ", string=text).strip()
     if text == "":
-        return None
-    if text.lower() in _PLACEHOLDER_SUMMARIES:
         return None
     if len(text) > max_chars:
         text = text[: max_chars - 1].rstrip() + "\u2026"
