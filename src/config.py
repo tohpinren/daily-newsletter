@@ -307,13 +307,6 @@ def build_sources(*, max_articles_per_feed: int) -> list[SourceDefinition]:
             limit=max_articles_per_feed,
         ),
         SourceDefinition(
-            name="Uber Engineering",
-            url="https://www.uber.com/blog/engineering/rss/",
-            source_type="rss",
-            section="engineering_blogs",
-            limit=max_articles_per_feed,
-        ),
-        SourceDefinition(
             name="Meta Engineering",
             url="https://engineering.fb.com/feed/",
             source_type="rss",
@@ -419,13 +412,6 @@ def build_sources(*, max_articles_per_feed: int) -> list[SourceDefinition]:
             limit=max_articles_per_feed,
         ),
         SourceDefinition(
-            name="CockroachDB Blog",
-            url="https://www.cockroachlabs.com/blog/rss/",
-            source_type="rss",
-            section="engineering_blogs",
-            limit=max_articles_per_feed,
-        ),
-        SourceDefinition(
             name="Yugabyte Blog",
             url="https://www.yugabyte.com/blog/feed/",
             source_type="rss",
@@ -462,7 +448,7 @@ def build_sources(*, max_articles_per_feed: int) -> list[SourceDefinition]:
         ),
         SourceDefinition(
             name="Dropbox Tech Blog",
-            url="https://blogs.dropbox.com/tech/feed/",
+            url="https://dropbox.tech/feed",
             source_type="rss",
             section="engineering_blogs",
             limit=max_articles_per_feed,

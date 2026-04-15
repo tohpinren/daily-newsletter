@@ -28,11 +28,13 @@ def _llm_candidate_articles(
     articles: list[Article],
     max_total: int,
     per_source_cap: int,
+    rotation_offset: int = 0,
 ) -> list[Article]:
     """Pick a recency-sorted, source-balanced pool so the model sees varied inputs.
 
     Raw section lists follow ``build_sources`` order, so the LLM otherwise tends to
-    overweight the same early feeds on every run.
+    overweight the same early feeds on every run. ``rotation_offset`` changes which
+    alphabetical source is visited first so the daily candidate pool shifts.
     """
     if not articles:
         return []
@@ -45,7 +47,11 @@ def _llm_candidate_articles(
     for article in sorted_by_recency:
         by_source[article.source].append(article)
 
-    source_names = sorted(by_source.keys())
+    names = sorted(by_source.keys())
+    if not names:
+        return []
+    pivot = rotation_offset % len(names)
+    source_names = names[pivot:] + names[:pivot]
     result: list[Article] = []
     counts: dict[str, int] = defaultdict(int)
     seen_urls: set[str] = set()
@@ -138,7 +144,13 @@ def _article_to_prompt_row(*, article: Article, section: SectionName) -> dict[st
     return row
 
 
-def _build_llm_prompt(*, section: SectionName, articles: list[Article], limit: int) -> str:
+def _build_llm_prompt(
+    *,
+    section: SectionName,
+    articles: list[Article],
+    limit: int,
+    edition_date_utc: str,
+) -> str:
     """Build instruction prompt for Gemini output in strict JSON."""
     payload = [_article_to_prompt_row(article=a, section=section) for a in articles]
     hn_rules = ""
@@ -158,6 +170,7 @@ def _build_llm_prompt(*, section: SectionName, articles: list[Article], limit: i
     return (
         "You are curating a daily newsletter section.\n"
         f"Section: {section}\n"
+        f"Newsletter edition date (UTC): {edition_date_utc}\n"
         f"Return top {limit} deduplicated items in strict JSON only.\n"
         "Rules:\n"
         "- Deduplicate semantically similar headlines.\n"
@@ -179,16 +192,26 @@ async def _call_gemini_curation(
     section: SectionName,
     articles: list[Article],
     limit: int,
+    edition_date_utc: str,
 ) -> list[Article]:
     """Call Gemini model and return curated article list."""
-    prompt = _build_llm_prompt(section=section, articles=articles, limit=limit)
+    prompt = _build_llm_prompt(
+        section=section,
+        articles=articles,
+        limit=limit,
+        edition_date_utc=edition_date_utc,
+    )
     endpoint = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
         "gemini-2.5-flash-lite:generateContent"
     )
     body = {
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"responseMimeType": "application/json"},
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "temperature": 0.9,
+            "topP": 0.95,
+        },
     }
     async with httpx.AsyncClient() as client:
         response = await client.post(
@@ -295,8 +318,12 @@ async def curate_sections_with_llm(
     section_limits["fintech_news"] = 5
     section_limits["engineering_blogs"] = 5
 
+    run_time = datetime.now(UTC)
+    edition_date_utc = run_time.date().isoformat()
+    day_index = run_time.timetuple().tm_yday
+
     output_sections: list[NewsletterSection] = []
-    for section_name in ordered_sections:
+    for section_index, section_name in enumerate(ordered_sections):
         articles = section_articles.get(section_name, [])
         limit = section_limits[section_name]
         if not articles:
@@ -313,6 +340,7 @@ async def curate_sections_with_llm(
             articles=articles,
             max_total=_MAX_CANDIDATES_FOR_LLM,
             per_source_cap=_MAX_PER_SOURCE_FOR_LLM,
+            rotation_offset=day_index + section_index,
         )
 
         try:
@@ -321,6 +349,7 @@ async def curate_sections_with_llm(
                 section=section_name,
                 articles=candidates,
                 limit=limit,
+                edition_date_utc=edition_date_utc,
             )
             if not curated_articles:
                 curated_articles = _fallback_curate_articles(articles=candidates, limit=limit)

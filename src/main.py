@@ -18,6 +18,17 @@ from src.models import Article, Newsletter
 from src.processor import curate_sections_with_llm, group_articles_by_section
 from src.sender import send_newsletter_email
 
+_DEFAULT_HTTP_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) "
+        "Gecko/20100101 Firefox/128.0 (daily-newsletter)"
+    ),
+    "Accept": (
+        "application/rss+xml, application/atom+xml, application/xml;q=0.9, "
+        "text/html;q=0.8, */*;q=0.5"
+    ),
+}
+
 
 async def _fetch_source_with_retry(
     *,
@@ -49,7 +60,7 @@ async def _fetch_source_with_retry(
 
 async def _collect_articles(*, sources: list[SourceDefinition]) -> list[Article]:
     """Collect articles from all configured sources concurrently."""
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(headers=_DEFAULT_HTTP_HEADERS) as client:
         tasks = [
             _fetch_source_with_retry(source=source, client=client, retries=3) for source in sources
         ]
